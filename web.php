@@ -1,31 +1,44 @@
 <?php
-use App\Http\Controllers\AdminController;
-use App\Http\Controllers\HomeController;
-use Illuminate\Support\Facades\Route;
 
+use Illuminate\Support\Facades\Route;
+use App\http\Controllers\DashboardController;
+use App\http\Controllers\MenuController;
+use App\http\Controllers\ChefsController;
+use App\http\Controllers\KontakController;
+use App\http\Controllers\HomeController;
+use App\http\Controllers\ReservationController;
+use App\http\Controllers\GalleryController;
+use App\Models\Reservation;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
 |--------------------------------------------------------------------------
 |
 | Here is where you can register web routes for your application. These
-| routes are loaded by the RouteServiceProvider within a group which
-| contains the "web" middleware group. Now create something great!
+| routes are loaded by the RouteServiceProvider and all of them will
+| be assigned to the "web" middleware group. Make something great!
 |
 */
+Route::Redirect('/', ('/index'));
 
-Route::get('/',[HomeController::class,"index"]);
-Route::get('/redirects', [HomeController::class, "redirects"]);
-Route::get('/users', [AdminController::class,"users"])->name('users');
-Route::get('/deleteusers/{id}', [AdminController::class, "deleteusers"]);
-Route::get('/editusersview/{id}', [AdminController::class, "editusersview"]);
-Route::post('/editusers/{id}', [AdminController::class, "editusers"]);
+Route::get('/index', [HomeController::class, 'index']);
+
 Route::middleware([
     'auth:sanctum',
     config('jetstream.auth_session'),
-    'verified'
+    'verified',
 ])->group(function () {
     Route::get('/dashboard', function () {
         return view('dashboard');
     })->name('dashboard');
+});
+
+Route::resource('menu', MenuController::class);
+Route::resource('chefs', ChefsController::class);
+Route::resource('kontak', KontakController::class);
+Route::resource('gallery', GalleryController::class);
+Route::controller(ReservationController::class)->prefix('reservation')->group(function () {
+    Route::get('', 'index')->name('reservation.index');
+    Route::post('store', 'store')->name('reservation.store');
+
 });
